@@ -106,7 +106,7 @@ def dfs_reconstruct(node, seq, graph, S2, total_len, visited, seq_full, path):
 
 if __name__ == "__main__":
     data_directory = 'data/'
-    xml_file = data_directory + 'bio.php2.xml'
+    xml_file = data_directory + 'bio.php4.xml'
     start, total_len, S1, S2 = parse_xml(xml_file)
     print("Start (oryginalny):", start)
     print("Długość sekwencji:", total_len)
