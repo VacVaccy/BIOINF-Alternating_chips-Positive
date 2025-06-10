@@ -2,6 +2,7 @@ import xml.etree.ElementTree as ET
 import random
 from collections import Counter
 from math import ceil
+from time import time
 
 def parse_xml(path):
     tree = ET.parse(path)
@@ -49,6 +50,7 @@ def crossover(parent1, parent2, S1, S2, pattern1_indices, pattern2_indices):
     else:
         cut_point = random.choice(safe_cut_points)
 
+    # cut_point = len(parent1) // 2
     child1 = parent1[:cut_point] + parent2[cut_point:]
     child2 = parent2[:cut_point] + parent1[cut_point:]
     return child1, child2
@@ -86,6 +88,7 @@ def genetic_algorithm(start, total_len, S1, S2, P1_idx, P2_idx, m1, m2, populati
     no_improvements_count = 0
 
     for gen in range(generations):
+        print(best_score)
         scored = [
             (calculate_fitness(ind, P1, P1_idx, m1) + calculate_fitness(ind, P2, P2_idx, m2), ind)
             for ind in population
@@ -98,10 +101,10 @@ def genetic_algorithm(start, total_len, S1, S2, P1_idx, P2_idx, m1, m2, populati
         
         if curr_best_score > best_score:
             best_score = curr_best_score
-            no_improvement_count = 0
+            no_improvements_count = 0
         else:
-            no_improvement_count += 1
-            if no_improvement_count >= max_no_improvement:
+            no_improvements_count += 1
+            if no_improvements_count >= max_no_improvement:
                 print(f"[!] Stopped at generation {gen+1}, no improvement for {max_no_improvement} generations.")
                 return scored[0]
         best = scored[0][1]
@@ -124,14 +127,16 @@ def genetic_algorithm(start, total_len, S1, S2, P1_idx, P2_idx, m1, m2, populati
 
 if __name__ == "__main__":
     population_size = 50
-    generations = 200000
-    max_no_improvement = ceil(generations / 100) 
+    generations = 20000
+    max_no_improvement = ceil(generations / 10)
     score_threshold_ratio = 0.85
 
-    data_directory = 'data/'
-    xml_file = data_directory + 'bio.php.xml'
+    xml_file = 'data/n80k7pe20.xml'
     start, total_len, S1, S2, P1_idx, P2_idx = parse_xml(xml_file)
     m1 = max(P1_idx) + 1
     m2 = max(P2_idx) + 1
+    t = time()
     best_score, best_sequence = genetic_algorithm(start, total_len, S1, S2, P1_idx, P2_idx, m1, m2, population_size, generations, max_no_improvement, score_threshold_ratio)
-    print(f"Best DNA sequence: {best_sequence}\nScore: {best_score}")
+    t = time() - t
+    print(f"Best DNA sequence: {best_sequence}\nScore: {best_score}\nBest possible score: {len(S1) + len(S2)}")
+    print(f"It took {t:.5f} s to find solution")

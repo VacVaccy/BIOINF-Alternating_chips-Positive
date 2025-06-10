@@ -1,4 +1,5 @@
 import xml.etree.ElementTree as ET
+from time import time
 
 def parse_xml(path):
     tree = ET.parse(path)
@@ -105,28 +106,33 @@ def dfs_reconstruct(node, seq, graph, S2, total_len, visited, seq_full, path):
 
 
 if __name__ == "__main__":
-    data_directory = 'data/'
-    xml_file = data_directory + 'bio.php4.xml'
+    xml_file = 'data/n200k10pe50.xml'
     start, total_len, S1, S2 = parse_xml(xml_file)
-    print("Start (oryginalny):", start)
-    print("Długość sekwencji:", total_len)
-    print("Fragmenty S₁:", S1)
-    print("Fragmenty S₂:", S2)
+    # print("Start (original):", start)
+    # print("Sequence length:", total_len)
+    # print("Fragments S₁:", S1)
+    # print("Fragments S₂:", S2)
+
+
+    t = time()
 
     graph, start_mod = build_overlap_graph(S1, start)
-    print("\nZbudowany graf:", graph)
-    print("\nZamaskowany start:", start_mod)
+    # print("\nCreated graph:", graph)
+    # print("\nMasked start:", start_mod)
     visited = set()
     result = dfs_reconstruct(
         start_mod, start_mod, graph, S2, total_len, 
         visited, start[:len(start)-1], [start_mod]
     )
 
+    t = time() - t
     if result:
         sequence, path = result
         print("\n\n")
-        print("Odtworzona sekwencja:", sequence)
-        print("długość:", len(sequence))
-        print("Ścieżka fragmentów:", " -> ".join(path))
+        print("Recreated sequence:", sequence)
+        print("length:", len(sequence))
+        print("Fragments path:", " -> ".join(path))
+        print(f"It took {t:.5f} s to find solution")
+
     else:
-        print("Nie znaleziono rekonstrukcji przy danych ograniczeniach.")
+        print("Couldn't reconstruct sequence with given conditions.")
